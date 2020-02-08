@@ -5,7 +5,9 @@ import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,6 +54,28 @@ public class CreateApplicationContextTest {
         @Bean
         public String anotherString() {
             return "Now I have two String beans";
+        }
+    }
+
+    @Test
+    void component_scan() {
+        final var context = new AnnotationConfigApplicationContext(ConfigWithComponentScan.class);
+
+        final var greeter = context.getBean(Greeter.class);
+
+        assertNotNull(greeter);
+        assertEquals("Howdy!", greeter.greeting());
+    }
+
+    @Configuration
+    @ComponentScan
+    public static class ConfigWithComponentScan {
+    }
+
+    @Component
+    public static class Greeter {
+        public String greeting() {
+            return "Howdy!";
         }
     }
 }
