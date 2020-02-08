@@ -1,13 +1,13 @@
 package springwithoutboot;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ExampleTest {
     @Test
@@ -30,6 +30,28 @@ public class ExampleTest {
         @Bean
         public String aString() {
             return "Hello, World!";
+        }
+    }
+
+    @Test
+    void given_config_with_non_uniquely_defined_beans_When_getting_bean_Then_it_fails() {
+        final var context = new AnnotationConfigApplicationContext(ConfigWithNonUniqueBeans.class);
+        assertThrows(
+            NoUniqueBeanDefinitionException.class,
+            () -> context.getBean(String.class)
+        );
+    }
+
+    @Configuration
+    public static class ConfigWithNonUniqueBeans {
+        @Bean
+        public String aString() {
+            return "Hello, World!";
+        }
+
+        @Bean
+        public String anotherString() {
+            return "Now I have two String beans";
         }
     }
 }
