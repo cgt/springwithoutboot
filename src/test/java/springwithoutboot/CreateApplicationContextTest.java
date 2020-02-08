@@ -88,24 +88,30 @@ public class CreateApplicationContextTest {
         context.getBean(InjectGreeterByMeansWhichSubvertTheTypeSystem.class).assertInitialized();
     }
 
+    public interface SelfTestingBean {
+        void assertInitialized();
+    }
+
     @Component
-    public static class InjectGreeterThroughConstructor {
+    public static class InjectGreeterThroughConstructor implements SelfTestingBean {
         private final Greeter greeter;
 
         public InjectGreeterThroughConstructor(Greeter greeter) {
             this.greeter = greeter;
         }
 
+        @Override
         public void assertInitialized() {
             assertNotNull(greeter);
         }
     }
 
     @Component
-    public static class InjectGreeterByMeansWhichSubvertTheTypeSystem {
+    public static class InjectGreeterByMeansWhichSubvertTheTypeSystem implements SelfTestingBean {
         @Autowired
         private Greeter greeter;
 
+        @Override
         public void assertInitialized() {
             assertNotNull(greeter);
         }
