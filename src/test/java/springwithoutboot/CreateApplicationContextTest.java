@@ -2,6 +2,7 @@ package springwithoutboot;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -76,6 +77,37 @@ public class CreateApplicationContextTest {
     public static class Greeter {
         public String greeting() {
             return "Howdy!";
+        }
+    }
+
+    @Test
+    void inject_dependency_into_component() {
+        final var context = new AnnotationConfigApplicationContext(ConfigWithComponentScan.class);
+
+        context.getBean(InjectGreeterThroughConstructor.class).assertInitialized();
+        context.getBean(InjectGreeterByMeansWhichSubvertTheTypeSystem.class).assertInitialized();
+    }
+
+    @Component
+    public static class InjectGreeterThroughConstructor {
+        private final Greeter greeter;
+
+        public InjectGreeterThroughConstructor(Greeter greeter) {
+            this.greeter = greeter;
+        }
+
+        public void assertInitialized() {
+            assertNotNull(greeter);
+        }
+    }
+
+    @Component
+    public static class InjectGreeterByMeansWhichSubvertTheTypeSystem {
+        @Autowired
+        private Greeter greeter;
+
+        public void assertInitialized() {
+            assertNotNull(greeter);
         }
     }
 }
