@@ -9,11 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ExampleTest {
     @Test
-    void anything() {
-        assertEquals(4, 2+2);
-    }
-
-    @Test
     void create_application_context() {
         final ApplicationContext context = new AnnotationConfigApplicationContext(MyConfig.class);
         assertNotNull(context);
