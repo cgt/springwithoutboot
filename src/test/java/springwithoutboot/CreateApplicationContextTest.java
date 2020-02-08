@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 
 public class CreateApplicationContextTest {
     @Test
@@ -69,7 +70,7 @@ public class CreateApplicationContextTest {
     }
 
     @Configuration
-    @ComponentScan
+    @ComponentScan(excludeFilters = @ComponentScan.Filter(value = ConfigWithTwoSelfTestingBeans.class, type = ASSIGNABLE_TYPE))
     public static class ConfigWithComponentScan {
     }
 
@@ -114,6 +115,42 @@ public class CreateApplicationContextTest {
         @Override
         public void assertInitialized() {
             assertNotNull(greeter);
+        }
+    }
+
+    @Test
+    void resolve_ambiguity() {
+        final var context = new AnnotationConfigApplicationContext(ConfigWithTwoSelfTestingBeans.class);
+
+        final var myFirstBean = (SelfTestingBean) context.getBean("myFirstBean");
+        assertNotNull(myFirstBean);
+        myFirstBean.assertInitialized();
+
+        final var mySecondBean = (SelfTestingBean) context.getBean("explicitly named bean");
+        assertNotNull(mySecondBean);
+        mySecondBean.assertInitialized();
+    }
+
+    @Configuration
+    public static class ConfigWithTwoSelfTestingBeans {
+        @Bean
+        public SelfTestingBean myFirstBean() {
+            return new InjectGreeterThroughConstructor(new Greeter() {
+                @Override
+                public String greeting() {
+                    return "my first greeting";
+                }
+            });
+        }
+
+        @Bean(name = "explicitly named bean")
+        public SelfTestingBean mySecondBean() {
+            return new InjectGreeterThroughConstructor(new Greeter() {
+                @Override
+                public String greeting() {
+                    return "my second greeting";
+                }
+            });
         }
     }
 }
