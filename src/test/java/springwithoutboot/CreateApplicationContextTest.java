@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ExampleTest {
+public class CreateApplicationContextTest {
     @Test
     void create_application_context() {
         final ApplicationContext context = new AnnotationConfigApplicationContext(MyConfig.class);
